@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemScope 2.0</title>
+
+    <style>
+
+        .header{
+            background-color: rgb(247, 202, 148);
+            text-align: center;
+            padding: 20px;
+        }
+
+        .introduction{
+            background-color: rgb(247, 202, 148);
+            padding: 20px;
+        }
+
+        .container{
+            background-color: bisque;
+            width: 90%;
+            margin: 20px auto;
+        }
+
+        .control-panel{
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        button{
+            padding: 10px 16px;
+            border: double;
+            background-color: rgb(240, 204, 3);
+        }
+        
+        button:hover{
+            background-color:rgb(247, 202, 148);
+        }
+        
+        .showplace{
+            margin-top: 20px;
+            background-color: blanchedalmond;
+            border:5px solid sandybrown;
+            padding: 10px;
+        }
+
+        .memory-area{
+            min-height: 350px;
+            background-color:white;
+            border:3px solid black;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* 变量盒子 */
+        .variable-box{
+            display: inline-block;
+            padding:12px 18px;
+            margin: 15px;
+            background-color:aquamarine;
+            border: 3px solid black;
+            border-radius: 6px;
+        }
+        .object-box {
+            display: inline-block;
+            padding: 12px 18px;
+            margin: 15px;
+            background-color: #dff7df;
+            border: 2px solid #27ae60;
+            border-radius: 6px;
+        }
+
+        .cell {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            line-height: 25px;
+            text-align: center;
+            border: 2px solid #f2994a;
+            background-color: #fff0df;
+            margin: 4px;
+            padding-top: 5px;
+        }
+
+        .arrow {
+            display: inline-block;
+            margin: 15px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>MemScope 2.0</h1>
+        <h3>作者：贺正宸</h3>
+    </header>
+
+    <section class="introduction">
+        <p>
+        MemScope 是一个用于学习 C 和 Python 内存模型的可视化工具。
+        通过变量盒子、对象盒子和箭头展示赋值、列表、引用和拷贝过程。
+    </p>
+    </section>
+    <main class="container">
+        
+        <section>
+            <p>请选择一个项目进行演示</p>
+        </section>
+        
+        <section class="control-panel">
+            <div>
+                <button onclick="showPythonAssignment()">Python变量赋值</button>
+                <button onclick="showCAssignment()">C变量赋值</button>
+            </div>
+
+            <div>
+                <button onclick="showlist()">一维列表</button>
+                <button onclick="showTwoDimensionalList()">二维列表</button>
+            </div>
+            
+            <div> 
+                <button onclick="showReference()">引用</button>
+                <button onclick="showShallowCopy()">浅拷贝</button>
+                <button onclick="showDeepCopy()">深拷贝</button>
+            </div>
+           
+        </section>
+
+    <section class="input-panel">
+        <label for="valueA">变量 a 的值：</label>
+        <input id="valueA" type="text" value="10">
+
+        <label for="valueB">变量 b 的值：</label>
+        <input id="valueB" type="text" value="20">
+
+        <button onclick="nextStep()">下一步</button>
+    </section>
+        
+        <p>演示区</p>
+        <section class="showplace memory-area" id="memoryarea">
+            <p>请选择上方的按钮，查看可视化展示</p>
+        </section>
+    </main>
+    <script>
+
+        let currentStep = 0;
+        let currentDemo = "";
+
+        function updateMemoryArea(content) {
+            document.getElementById("memoryarea").innerHTML = content;
+        }
+
+        function getInputValues() {
+            let valueA = document.getElementById("valueA").value;
+            let valueB = document.getElementById("valueB").value;
+            
+            if (valueA ===""){
+                valueA = "10";
+            }
+
+            if (valueB ===""){
+                valueB = "20";
+            }
+
+            return {
+                valueA: valueA,
+                valueB: valueB
+            }
+        }
+
+        function showPythonAssignment(){
+            currentStep = 1;
+            currentDemo = "python";
+            renderPythonAssignment();
+        }
+
+        function renderPythonAssignment(){
+            const values = getInputValues();
+            let valueA = values.valueA;
+            let valueB = values.valueB;
+
+            if(currentStep===1){
+                updateMemoryArea(`
+                    <h3>Python变量赋值分步演示</h3>
+                    <h4>步骤1：执行 a = ${valueA}</h4>
+                    <div class="variable-box">变量 a</div>
+                    <span class="arrow">→</span>
+                    <div class="object-box">对象 ${valueA}</div>
+                    `);
+            }
+            if(currentStep === 2){
+                updateMemoryArea(`
+                    <h3>Python变量赋值分步演示</h3>
+
+                    <h4>步骤2：执行 b = ${valueB}</h4>
+                    <div class="variable-box">变量 b</div>
+                    <span class="arrow">→</span>
+                    <div class="object-box">对象 ${valueB}</div>
+
+                    <p>a 和 b 都是变量名，它们分别指向对应的对象。</p>
+                `);
+            }
+
+            if (currentStep >= 3) {
+                updateMemoryArea(`
+                    <h3>Python变量赋值分步演示</h3>
+                    <h4>步骤3：总结</h4>
+                    <div class="variable-box">变量 a</div>
+                    <span class="arrow">→</span>
+                    <div class="object-box">对象 ${valueA}</div>
+
+                    <div class="variable-box">变量 b</div>
+                    <span class="arrow">→</span>
+                    <div class="object-box">对象 ${valueB}</div>
+
+                    <p>结论：Python 变量保存的是对象的引用，不是直接保存值本身。</p>
+                `);
+                }
+            }
+
+
+        function showCAssignment(){
+            currentStep = 1;
+            currentDemo = "c";
+            renderCAssignment();
+        }
+
+        function renderCAssignment(){
+            let valueA =document.getElementById("valueA").value;
+            let valueB =document.getElementById("valueB").value;
+
+            if(currentStep===1){
+                updateMemoryArea(`
+                <h3>C变量赋值后的内存变化</h3>
+
+                <h4>步骤1：执行 int a = ${valueA};</h4>
+                <div class="variable-box">
+                    变量 a<br>
+                    地址：0x100<br>
+                    值：${valueA}
+                </div>
+                <p>在 C 语言中，变量 a 的内存空间中直接保存这个值。</p>`);
+            }
+            if (currentStep===2){
+                updateMemoryArea(`
+                <h3>C变量赋值后的内存变化</h3>
+                <h4>步骤2：执行 int b = ${valueB};</h4>
+                <div class="variable-box">
+                    变量 b<br>
+                    地址：0x104<br>
+                    值：${valueB}
+                </div>`);
+            }
+            if (currentStep >= 3) {
+                updateMemoryArea(`
+                    <h3>C变量赋值后的内存变化</h3>
+                    <h4>步骤3：总结</h4>
+                    <div class="variable-box">
+                        变量 a<br>
+                        地址：0x100<br>
+                        值：${valueA}
+                    </div>
+
+                    <div class="variable-box">
+                        变量 b<br>
+                        地址：0x104<br>
+                        值：${valueB}
+                    </div>
+                `);
+            }
+        }
+
+        function nextStep(){
+            if (currentDemo === "python") {
+                currentStep++;
+                renderPythonAssignment();
+            } else if (currentDemo === "c") {
+                currentStep++;
+                renderCAssignment();
+            } else {
+                updateMemoryArea("<p>请先选择 Python变量赋值 或 C变量赋值。</p>");
+            }
+        }
+
+        function showlist(){
+            updateMemoryArea(`
+            <h3>一维列表内存展示</h3>
+
+            <h4>执行 nums = [10, 20, 30]</h4>
+
+            <div class="variable-box">变量 nums</div>
+            <span class="arrow">→</span>
+
+            <div class="object-box">
+                列表对象 nums<br><br>
+                <span class="cell">0<br>10</span>
+                <span class="cell">1<br>20</span>
+                <span class="cell">2<br>30</span>
+            </div>
+
+             <p>nums 保存的是列表对象的引用。列表对象内部按照下标保存元素，0、1、2 表示列表下标。</p>
+            `);
+        }
+
+        function showTwoDimensionalList(){
+            updateMemoryArea(`
+            <h3>二维列表内存展示</h3>
+
+            <h4>执行 matrix = [[1, 2], [3, 4]]</h4>
+
+            <div class="variable-box">变量 matrix</div>
+            <span class="arrow">→</span>
+
+            <div class="object-box">
+                外层列表 matrix<br><br>
+                <span class="cell">0<br>row0</span>
+                <span class="cell">1<br>row1</span>
+            </div>
+
+            <br><br>
+
+            <div class="object-box">
+                row0<br><br>
+                <span class="cell">0<br>1</span>
+                <span class="cell">1<br>2</span>
+            </div>
+
+            <div class="object-box">
+                row1<br><br>
+                <span class="cell">0<br>3</span>
+                <span class="cell">1<br>4</span>
+            </div>
+
+        <p>二维列表可以理解为“外层列表中保存内层列表的引用”。matrix[0] 指向 row0，matrix[1] 指向 row1。</p>
+    `);
+        }
+
+        function showReference(){
+            updateMemoryArea(`
+                <h3>引用关系展示</h3>
+
+                <h4>执行 a = [1, 2]</h4>
+                <div class="variable-box">变量 a</div>
+                <span class="arrow">→</span>
+                <div class="object-box">
+                    列表对象<br><br>
+                    <span class="cell">0<br>1</span>
+                    <span class="cell">1<br>2</span>
+                </div>
+
+                <h4>执行 b = a</h4>
+                <div class="variable-box">变量 a</div>
+                <div class="variable-box">变量 b</div>
+                <span class="arrow">→</span>
+                <div class="object-box">
+                    同一个列表对象<br><br>
+                    <span class="cell">0<br>1</span>
+                    <span class="cell">1<br>2</span>
+                </div>
+
+        <p>执行 b = a 后，并没有创建新的列表。a 和 b 都引用同一个列表对象，所以通过 b 修改列表时，a 看到的内容也会变化。</p>
+    `);
+        }
+
+        function showShallowCopy(){
+            updateMemoryArea(`
+                <h3>浅拷贝展示</h3>
+
+                <h4>原列表：a = [[1, 2], [3, 4]]</h4>
+
+                <div class="variable-box">变量 a</div>
+                <span class="arrow">→</span>
+                <div class="object-box">
+                    外层列表 a<br><br>
+                    <span class="cell">0<br>row0</span>
+                    <span class="cell">1<br>row1</span>
+                </div>
+
+                <br><br>
+
+                <h4>执行 b = a.copy()</h4>
+
+                <div class="variable-box">变量 b</div>
+                <span class="arrow">→</span>
+                <div class="object-box">
+                    新的外层列表 b<br><br>
+                    <span class="cell">0<br>row0</span>
+                    <span class="cell">1<br>row1</span>
+                </div>
+
+                <br><br>
+
+                <div class="object-box">
+                    共享的 row0<br><br>
+                    <span class="cell">0<br>1</span>
+                    <span class="cell">1<br>2</span>
+                </div>
+
+                <div class="object-box">
+                    共享的 row1<br><br>
+                    <span class="cell">0<br>3</span>
+                    <span class="cell">1<br>4</span>
+                </div>
+
+                <p>浅拷贝会创建一个新的外层列表，所以 a 和 b 的外层列表不同；但是里面的 row0 和 row1 没有被复制，仍然被 a 和 b 共同引用。</p>
+    `);
+        }
+        function showDeepCopy(){
+            updateMemoryArea(`
+                <h3>深拷贝展示</h3>
+
+                <h4>原列表：a = [[1, 2], [3, 4]]</h4>
+
+                <div class="variable-box">变量 a</div>
+                <span class="arrow">→</span>
+                <div class="object-box">
+                    外层列表 a<br><br>
+                    <span class="cell">0<br>a_row0</span>
+                    <span class="cell">1<br>a_row1</span>
+                </div>
+
+                <br><br>
+
+                <div class="object-box">
+                    a_row0<br><br>
+                    <span class="cell">0<br>1</span>
+                    <span class="cell">1<br>2</span>
+                </div>
+
+                <div class="object-box">
+                    a_row1<br><br>
+                    <span class="cell">0<br>3</span>
+                    <span class="cell">1<br>4</span>
+                </div>
+
+                <hr>
+
+                <h4>执行 b = copy.deepcopy(a)</h4>
+
+                <div class="variable-box">变量 b</div>
+                <span class="arrow">→</span>
+                <div class="object-box">
+                    新的外层列表 b<br><br>
+                    <span class="cell">0<br>b_row0</span>
+                    <span class="cell">1<br>b_row1</span>
+                </div>
+
+                <br><br>
+
+                <div class="object-box">
+                    新的 b_row0<br><br>
+                    <span class="cell">0<br>1</span>
+                    <span class="cell">1<br>2</span>
+                </div>
+
+                    <div class="object-box">
+                    新的 b_row1<br><br>
+                    <span class="cell">0<br>3</span>
+                    <span class="cell">1<br>4</span>
+                </div>
+
+                <p>深拷贝会递归复制外层列表和内层列表。a 和 b 不共享内部列表，所以修改 b_row0 不会影响 a_row0。</p>
+    `);
+        }
+
+    </script>
+</body>
+</html>
